@@ -13,6 +13,9 @@ class Import
 
 	protected $_last_error;
 
+	protected $_last_request;
+	protected $_last_response;
+
 	public function __construct($access_token, $secret_key, $data_source_uuid = null)
 	{
 		$this->_access_token = $access_token;
@@ -50,8 +53,8 @@ class Import
 			$out = $Http->GET();
 		}
 
-		error_log('last response: ' . $Http->lastResponse());
-		//error_log('last info: ' . print_r($Http->lastInfo(), true));
+		$this->_last_request = $Http->lastRequest();
+		$this->_last_response = $Http->lastResponse();
 
 		return json_decode($out);
 	}
@@ -101,6 +104,16 @@ curl -X POST "https://api.chartmogul.com/v1/import/data_sources" \
 		}
 
 		return $out;
+	}
+
+	public function lastRequest()
+	{
+		return $this->_last_request;
+	}
+
+	public function lastResponse()
+	{
+		return $this->_last_response;
 	}
 
 	public function lastErrors()
