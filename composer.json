@@ -1,0 +1,21 @@
+{
+    "name": "consolibyte/chartmogul-php",
+    "description": "PHP lib for ChartMogul API",
+    "license": "MIT",
+    "keywords": ["chartmogul"],
+    "authors": [
+        {
+            "name": "Keith Palmer",
+            "email": "keith@consolibyte.com"
+        }
+    ],
+    "require": {},
+    "require-dev": {
+        "phpunit/phpunit": "4.0.*"
+    },
+    "autoload": {
+        "psr-4": {
+            "ChartMogul\\": "src"
+        }
+    }
+}
