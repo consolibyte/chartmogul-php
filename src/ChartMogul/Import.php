@@ -189,9 +189,17 @@ curl -X POST "https://api.chartmogul.com/v1/import/plans" \
 	{
 		$resp = $this->invoices(array( $invoice ));
 
-		if ($this->_handleErrors($resp))
+		if ($this->_handleErrors($resp) and 
+			!empty($resp->invoices))
 		{
-			return $resp->invoices[0];
+			return $this->_handleErrors($resp->invoices[0]);
+		}
+		else if ($this->_handleErrors($resp))
+		{
+			// Not sure what happened here... track this down!
+			// @todo 
+			// 
+			error_log('ChartMogul error: ' . $this->lastResponse());
 		}
 
 		return false;
