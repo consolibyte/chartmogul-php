@@ -94,6 +94,11 @@ curl -X POST "https://api.chartmogul.com/v1/import/data_sources" \
 		return $this->_handleErrors($out);
 	}
 
+	protected function _pushError($err)
+	{
+		$this->_last_error[] = $err;
+	}
+
 	protected function _handleErrors($out)
 	{
 		if (!empty($out->errors))
@@ -319,7 +324,7 @@ curl -X PATCH "https://api.chartmogul.com/v1/import/subscriptions/sub_e6bc5407-e
 		 */
 	}
 
-	public function transaction()
+	public function transaction($transaction)
 	{
 		/*
 		curl -X POST "https://api.chartmogul.com/v1/import/invoices/inv_565c73b2-85b9-49c9-a25e-2b7df6a677c9/transactions" \
@@ -331,6 +336,16 @@ curl -X PATCH "https://api.chartmogul.com/v1/import/subscriptions/sub_e6bc5407-e
 			"result": "successful"
 		 }'
 		 */
+		
+		if (empty($transaction['invoice_uuid']))
+		{
+			$this->_pushError('You must specify an invoice_uuid.');
+			return false;
+		}
+
+		$out = $this->_request('invoices/' . $transaction['invoice_uuid']. '/transactions', $transaction);
+
+		return $this->_handleErrors($out);
 	}
 
 
