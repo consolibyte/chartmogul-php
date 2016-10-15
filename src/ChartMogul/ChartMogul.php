@@ -4,6 +4,8 @@ namespace ChartMogul;
 
 class ChartMogul
 {
+	const ERR_AUTH = 401;
+
 	const TRANSACTION_TYPE_PAYMENT = 'payment';
 	const TRANSACTION_TYPE_REFUND = 'refund';
 

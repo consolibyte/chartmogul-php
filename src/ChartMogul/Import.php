@@ -26,7 +26,14 @@ class Import
 
 	public function ping()
 	{
+		/*
+		curl -X GET "https://api.chartmogul.com/v1/ping" \
+     -u YOUR_ACCOUNT_TOKEN:YOUR_SECRET_KEY
+		 */
 		
+		$out = $this->_request('../ping');
+
+		return $this->_handleErrors($out);
 	}
 
 	protected function _request($endpoint, $payload = null)
@@ -72,7 +79,12 @@ class Import
 		
 		$out = $this->_request('data_sources');
 
-		return $out->data_sources;
+		if ($this->_handleErrors($out))
+		{
+			return $out->data_sources;
+		}
+
+		return false;
 	}
 
 	public function dataSource($name)
@@ -104,6 +116,21 @@ curl -X POST "https://api.chartmogul.com/v1/import/data_sources" \
 		if (!empty($out->errors))
 		{
 			$this->_last_error = $out->errors;
+
+			return false;
+		}
+
+		if (!empty($out->error))
+		{
+			$this->_pushError($out->error);
+
+			return false;
+		}
+
+		if (!empty($out->code) and 
+			$out->code == ChartMogul::ERR_AUTH)
+		{
+			$this->_pushError($out->code . ': ' . $out->message);
 
 			return false;
 		}
