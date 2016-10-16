@@ -207,6 +207,11 @@ class Http
 	{
 		return $this->_request('GET');
 	}
+
+	public function PATCH()
+	{
+		return $this->_request('PATCH');
+	}
 	
 	public function POST()
 	{
@@ -368,6 +373,12 @@ class Http
 		{
 			$headers[] = 'Content-Length: ' . strlen($raw_body);
 			$params[CURLOPT_POST] = true;
+			$params[CURLOPT_POSTFIELDS] = $raw_body;
+		}
+		else if ($method == 'PATCH')
+		{
+			$headers[] = 'Content-Length: ' . strlen($raw_body);
+			$params[CURLOPT_CUSTOMREQUEST] = 'PATCH';
 			$params[CURLOPT_POSTFIELDS] = $raw_body;
 		}
 

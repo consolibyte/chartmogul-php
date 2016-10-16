@@ -36,7 +36,7 @@ class Import
 		return $this->_handleErrors($out);
 	}
 
-	protected function _request($endpoint, $payload = null)
+	protected function _request($endpoint, $payload = null, $force_method_to = null)
 	{
 		$Http = new Util\Http(self::BASE . $endpoint);
 
@@ -51,7 +51,11 @@ class Import
 			'Content-Type: application/json', 
 			));
 
-		if ($payload)
+		if ($force_method_to == 'PATCH')
+		{
+			$out = $Http->PATCH();
+		}
+		else if ($payload)
 		{
 			$out = $Http->POST();
 		}
@@ -228,10 +232,7 @@ curl -X POST "https://api.chartmogul.com/v1/import/plans" \
 		}
 		else if ($this->_handleErrors($resp))
 		{
-			// Not sure what happened here... track this down!
-			// @todo 
-			// 
-			error_log('ChartMogul error: ' . $this->lastResponse());
+			return false;
 		}
 
 		return false;
@@ -338,7 +339,7 @@ curl -X POST "https://api.chartmogul.com/v1/import/customers/cus_f466e33d-ff2b-4
 		 */
 	}
 
-	public function cancel()
+	public function cancel($sub_uuid, $when)
 	{
 		/*
 		# When a Subscription is cancelled
@@ -349,6 +350,12 @@ curl -X PATCH "https://api.chartmogul.com/v1/import/subscriptions/sub_e6bc5407-e
 		  "cancelled_at": "2016-01-15 00:00:00"
 		}'
 		 */
+		
+		$out = $this->_request('subscriptions/' . $sub_uuid, array(
+			'cancelled_at' => date('c', strtotime($when))
+			), 'PATCH');
+
+		return $this->_handleErrors($out);
 	}
 
 	public function transaction($transaction)
