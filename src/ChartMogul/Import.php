@@ -119,7 +119,7 @@ curl -X POST "https://api.chartmogul.com/v1/import/data_sources" \
 	{
 		if (!empty($out->errors))
 		{
-			$this->_last_error = $out->errors;
+			$this->_last_error = (array) $out->errors;
 
 			return false;
 		}
