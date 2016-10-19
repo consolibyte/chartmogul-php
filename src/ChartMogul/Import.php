@@ -22,6 +22,8 @@ class Import
 		$this->_secret_key = $secret_key;
 
 		$this->_data_source_uuid = $data_source_uuid;
+
+		$this->_last_error = array();
 	}
 
 	public function ping()
@@ -112,6 +114,11 @@ curl -X POST "https://api.chartmogul.com/v1/import/data_sources" \
 
 	protected function _pushError($err)
 	{
+		if (is_object($this->_last_error))
+		{
+			error_log('Why is this an object? ' . print_r($this->_last_error, true));
+		}
+
 		$this->_last_error[] = $err;
 	}
 
