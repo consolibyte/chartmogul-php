@@ -1,8 +1,8 @@
-<?php 
+<?php
 
 namespace ChartMogul;
- 
-class Import 
+
+class Import
 {
 	const BASE = 'https://api.chartmogul.com/v1/import/';
 
@@ -32,7 +32,7 @@ class Import
 		curl -X GET "https://api.chartmogul.com/v1/ping" \
      -u YOUR_ACCOUNT_TOKEN:YOUR_SECRET_KEY
 		 */
-		
+
 		$out = $this->_request('../ping');
 
 		return $this->_handleErrors($out);
@@ -45,12 +45,12 @@ class Import
 		$Http->setRawBody(json_encode($payload));
 
 		$Http->setAuth($this->_access_token, $this->_secret_key);
-		
+
 		$Http->verifyPeer(false);
 		$Http->verifyHost(false);
 
 		$Http->setHeaders(array(
-			'Content-Type: application/json', 
+			'Content-Type: application/json',
 			));
 
 		if ($force_method_to == 'PATCH')
@@ -82,7 +82,7 @@ class Import
 		/*
 		https://api.chartmogul.com/v1/import/data_sources
 		 */
-		
+
 		$out = $this->_request('data_sources');
 
 		if ($this->_handleErrors($out))
@@ -100,13 +100,13 @@ class Import
 curl -X POST "https://api.chartmogul.com/v1/import/data_sources" \
 	 -u YOUR_ACCOUNT_TOKEN:YOUR_SECRET_KEY \
 	 -H "Content-Type: application/json" \
-	 -d '{ 
+	 -d '{
 		  "name": "In-house billing"
 		 }'
 		 */
-		
+
 		$out = $this->_request('data_sources', array(
-			'name' => $name, 
+			'name' => $name,
 			));
 
 		return $this->_handleErrors($out);
@@ -138,8 +138,15 @@ curl -X POST "https://api.chartmogul.com/v1/import/data_sources" \
 			return false;
 		}
 
-		if (!empty($out->code) and 
+		if (!empty($out->code) and             // No permission
 			$out->code == ChartMogul::ERR_AUTH)
+		{
+			$this->_pushError($out->code . ': ' . $out->message);
+
+			return false;
+		}
+		else if (!empty($out->code) and        // Account has expired
+			$out->code == ChartMogul::ERR_EXPIRED)
 		{
 			$this->_pushError($out->code . ': ' . $out->message);
 
@@ -180,8 +187,8 @@ curl -X POST "https://api.chartmogul.com/v1/import/customers" \
 		  "city": "New York"
 		 }'
 		 */
-		
-		if (empty($customer['data_source_uuid']) and 
+
+		if (empty($customer['data_source_uuid']) and
 			$this->_data_source_uuid)
 		{
 			$customer['data_source_uuid'] = $this->_data_source_uuid;
@@ -199,7 +206,7 @@ curl -X POST "https://api.chartmogul.com/v1/import/customers" \
 curl -X POST "https://api.chartmogul.com/v1/import/plans" \
 	 -u YOUR_ACCOUNT_TOKEN:YOUR_SECRET_KEY \
 	 -H "Content-Type: application/json" \
-	 -d '{ 
+	 -d '{
 		   "data_source_uuid": "ds_fef05d54-47b4-431b-aed2-eb6b9e545430",
 		   "name": "Bronze Plan",
 		   "interval_count": 1,
@@ -207,8 +214,8 @@ curl -X POST "https://api.chartmogul.com/v1/import/plans" \
 		   "external_id": "plan_0001"
 		 }'
 		 */
-		
-		if (empty($plan['data_source_uuid']) and 
+
+		if (empty($plan['data_source_uuid']) and
 			$this->_data_source_uuid)
 		{
 			$plan['data_source_uuid'] = $this->_data_source_uuid;
@@ -232,7 +239,7 @@ curl -X POST "https://api.chartmogul.com/v1/import/plans" \
 	{
 		$resp = $this->invoices(array( $invoice ));
 
-		if ($this->_handleErrors($resp) and 
+		if ($this->_handleErrors($resp) and
 			!empty($resp->invoices))
 		{
 			return $this->_handleErrors($resp->invoices[0]);
@@ -276,7 +283,7 @@ curl -X POST "https://api.chartmogul.com/v1/import/customers/cus_f466e33d-ff2b-4
 			  "type": "payment",
 			  "result": "successful"
 			}
-		  ]   
+		  ]
 	   },
 	   {
 		  "external_id": "INV0002",
@@ -303,12 +310,12 @@ curl -X POST "https://api.chartmogul.com/v1/import/customers/cus_f466e33d-ff2b-4
 			  "type": "payment",
 			  "result": "successful"
 			}
-		  ]   
+		  ]
 	   }
 	 ]
 	 }'
 		 */
-		
+
 		// PRORATED
 		/*
 		# Example of a prorated charge for an additional subscription
@@ -339,7 +346,7 @@ curl -X POST "https://api.chartmogul.com/v1/import/customers/cus_f466e33d-ff2b-4
 			  "type": "payment",
 			  "result": "successful"
 			}
-		  ]   
+		  ]
 		}
 	   ]
 }'
@@ -353,11 +360,11 @@ curl -X POST "https://api.chartmogul.com/v1/import/customers/cus_f466e33d-ff2b-4
 curl -X PATCH "https://api.chartmogul.com/v1/import/subscriptions/sub_e6bc5407-e258-4de0-bb43-61faaf062035" \
 	 -u YOUR_ACCOUNT_TOKEN:YOUR_SECRET_KEY \
 	 -H "Content-Type: application/json" \
-	 -d '{ 
+	 -d '{
 		  "cancelled_at": "2016-01-15 00:00:00"
 		}'
 		 */
-		
+
 		$out = $this->_request('subscriptions/' . $sub_uuid, array(
 			'cancelled_at' => date('c', strtotime($when))
 			), 'PATCH');
@@ -377,7 +384,7 @@ curl -X PATCH "https://api.chartmogul.com/v1/import/subscriptions/sub_e6bc5407-e
 			"result": "successful"
 		 }'
 		 */
-		
+
 		if (empty($transaction['invoice_uuid']))
 		{
 			$this->_pushError('You must specify an invoice_uuid.');
