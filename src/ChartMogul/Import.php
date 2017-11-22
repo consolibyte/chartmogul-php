@@ -171,7 +171,7 @@ curl -X POST "https://api.chartmogul.com/v1/import/data_sources" \
 		return $this->_last_error;
 	}
 
-	public function customer($customer)
+	public function customer($customer, $uuid = null)
 	{
 		/*
 		# 2. Create Customers
@@ -194,7 +194,15 @@ curl -X POST "https://api.chartmogul.com/v1/import/customers" \
 			$customer['data_source_uuid'] = $this->_data_source_uuid;
 		}
 
-		$out = $this->_request('customers', $customer);
+		$uri = 'customers';
+		$method = null;
+		if ($uuid)
+		{
+			$uri .= '/' . $uuid;
+			$method = 'PATCH';
+		}
+
+		$out = $this->_request($uri, $customer, $method);
 
 		return $this->_handleErrors($out);
 	}
