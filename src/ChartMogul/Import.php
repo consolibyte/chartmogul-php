@@ -171,6 +171,22 @@ curl -X POST "https://api.chartmogul.com/v1/import/data_sources" \
 		return $this->_last_error;
 	}
 
+	/**
+	 * Search for customers
+	 *
+	 * @param  array $search [description]
+	 * @return array         [description]
+	 */
+	public function searchCustomers($search)
+	{
+		$uri = 'customers';
+		$uri .= '?' . http_build_query($search);
+
+		$out = $this->_request($uri);
+
+		return $this->_handleErrors($out);
+	}
+
 	public function customer($customer, $uuid = null)
 	{
 		/*
