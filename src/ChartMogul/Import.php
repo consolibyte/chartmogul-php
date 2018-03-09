@@ -254,6 +254,14 @@ curl -X POST "https://api.chartmogul.com/v1/import/plans" \
 	{
 		$first = $invoices[0];
 
+		foreach ($invoices as $key => $invoice)
+		{
+			if (empty($invoice['data_source_uuid']))
+			{
+				$invoices[$key]['data_source_uuid'] = $this->_data_source_uuid;
+			}
+		}
+
 		$out = $this->_request('customers/' . $first['customer_uuid'] . '/invoices', array( 'invoices' => $invoices ));
 
 		return $this->_handleErrors($out);
